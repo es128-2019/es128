@@ -1,0 +1,192 @@
+*************************************************
+**
+** written by James R. Rice
+**
+** last modified: 1/29/2010
+** by: Katia Bertoldi
+**
+*************************************************
+**
+** brief description:
+**
+** An Example.inp File for an ABAQUS Finite
+** Element Solution
+**
+** Double asterisks (at left) indicate a comment
+** All such comments are ignored by the computer
+** They are inserted for clarity only
+**
+**
+*************************************************
+**
+** heading information
+**
+*************************************************
+**
+*HEADING
+Three Bar Truss: ES128 Example Problem
+**
+** the HEADING title (Three Bar...) will appear
+** on any output files created by ABAQUS
+**
+** Note on capitalization: In general, you do
+** not have to worry about case in input files.
+** The exception is with the use of parameters,
+** (not used in this file); parameter names are
+** case sensitive.
+**
+** Note on Units: ABAQUS does not have a built-in
+** system of units. All input data must be
+** specified in consistent units. The units used
+** here would be consistent for Steel with
+** forces in lbf, and lengths in in.
+**
+*************************************************
+**
+** Node definitions
+**
+*************************************************
+**
+** The next statements give the locations of
+** nodal points, corresponding in this example
+** to the "joints" of the truss system. First
+** entry is node number, and the next are its
+** x1, x2, x3 coordinates.
+**
+*NODE
+1, 5.0, 10.0
+2, 7.5, 10.0
+3, 10.0, 10.0
+4, 10.0, 0.0
+**
+***********************************************
+**
+** Element Definitions
+**
+**********************************************
+**
+** Next, the elements (corresponding to truss
+** bars in this case) are defined. Also, the
+** type of element, from the element library
+** available within ABAQUS, is defined. The
+** first number shown is the element number,
+** and the next two are the two nodes which
+** that element joins. The set of elements is
+** given the name "BARS." Note that this is a
+** 2D element type (T2D2); for 3D analyses, use
+** T3D2.
+**
+**
+*ELEMENT, TYPE=T2D2, ELSET=BARS
+1, 4, 1
+2, 4, 2
+3, 4, 3
+**
+***********************************************
+**
+** Material Definitions
+**
+***********************************************
+**
+** We now describe properties of the material,
+** beginning with the cross section area (0.1)
+** and Young's modulus E (1000.0), in the units
+** adopted. The Poisson ratio nu is irrelevant
+** here.
+**
+*SOLID SECTION, ELSET=BARS, MATERIAL=MAT1
+0.1
+*MATERIAL, NAME=MAT1
+*ELASTIC
+1000.0
+**
+**********************************************
+**
+** Step 1: apply concentrated load
+**
+**********************************************
+**
+** Now we describe the loading, in this case
+** as a single "step." Since this involves
+** linear elastic material and we are content
+** to neglect any effects of geometry change,
+** due to deformation, on the writing of the
+** equilibrium equations, our problem is a
+** completely linear one.
+**
+** We indicate that NLGEOM=NO
+** to indicate that this is a linear step
+**
+**
+*STEP, NAME=STEP-1,NLGEOM=NO
+*STATIC
+**
+**********************************************
+**
+** Boundary Conditions
+**
+**********************************************
+**
+** Next, come statements about fixed boundary
+** points. The node number is given first, and
+** then the first and last degree of freedom
+** that is restrained at the node -- displacements
+** U1, U2, and U3 are zero in this case. It was
+** not really necessary to mention U3, since
+** the problem is set up as 2D
+**
+*BOUNDARY
+1, 1, 2, 0.0
+2, 1, 2, 0.0
+3, 1, 2, 0.0
+**
+**********************************************
+**
+** Loads
+**
+**********************************************
+**
+** The following specifies that a concentrated
+** load, <Load>, which was defined above as
+** -10000 in the units adopted, is applied in
+** the x2 direction at node 4 (i.e., 10000 is
+** applied in the negative x2 direction).
+**
+*CLOAD
+4, 2, -10.0
+**
+***********************************************
+**
+** OUTPUT REQUESTS
+**
+** Note about output: For large analyses, it is
+** important to consider output requests carefully,
+** as they can create very large files.
+**
+***********************************************
+**
+** The following option is used to write output
+** to the output database file ( for plotting in
+** ABAQUS/Viewer)
+**
+*OUTPUT, FIELD, VARIABLE=PRESELECT
+**
+** The following options are used to provide tabular
+** printed output of element and nodal variables to
+** the data and results files
+**
+*EL PRINT, ELSET=BARS
+S, E, COORD
+*NODE PRINT
+U, COORD
+**
+************************************************
+**
+** End Step
+**
+************************************************
+**
+** The final statement tells ABAQUS that loading
+** step is over.
+**
+*END STEP
